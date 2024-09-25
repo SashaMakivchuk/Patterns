@@ -24,13 +24,13 @@ namespace lab2
     class Phone : IProduct
     {
         public string Name { get; } = "Phone";
-        public double Price { get; } = 1000;
+        public double Price { get; } = 100;
     }
 
     class Laptop : IProduct
     {
         public string Name { get; } = "Laptop";
-        public double Price { get; } = 3000;
+        public double Price { get; } = 300;
     }
     interface IPay //interface for payment methods
     {
@@ -81,7 +81,7 @@ namespace lab2
         }
     }
 
-    abstract class PaymentFactory //same as abst for prod but for paumants
+    abstract class PaymentFactory //same as abst for prod but for pauments
     {
         public abstract IPay CreatePayment();
     }
