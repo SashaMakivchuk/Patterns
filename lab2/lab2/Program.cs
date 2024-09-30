@@ -61,6 +61,56 @@ namespace lab2
             Console.WriteLine($"Credit for: {amount}$. Month pay: {monthlyPayment}$ for {_months} month(s).");
         }
     }
+    class Order // Class for managing orders
+    {
+        private List<(IProduct product, int quantity)> _items = new List<(IProduct, int)>();
+
+        public void AddItem(IProduct product, int quantity)
+        {
+            _items.Add((product, quantity));
+        }
+
+        public double GetTotalPrice()
+        {
+            double total = 0;
+            foreach (var item in _items)
+            {
+                total += item.product.Price * item.quantity;
+            }
+            return total;
+        }
+    }
+    abstract class SaleSystem // Abstraction in the Bridge pattern
+    {
+        protected IPay _paymentMethod;
+
+        public SaleSystem(IPay paymentMethod)
+        {
+            _paymentMethod = paymentMethod;
+        }
+
+        public abstract void SellProduct(IProduct product, int quantity);
+        public abstract void SellOrder(Order order);
+    }
+    class BasicSale : SaleSystem // Concrete Abstraction
+    {
+        public BasicSale(IPay paymentMethod) : base(paymentMethod) { }
+
+        public override void SellProduct(IProduct product, int quantity)
+        {
+            double total = product.Price * quantity; // Total price for product
+            Console.WriteLine($"Selling {quantity} unit(s) of {product.Name} at {product.Price}$ each.");
+            _paymentMethod.Pay(total);
+        }
+
+        public override void SellOrder(Order order)
+        {
+            double total = order.GetTotalPrice();
+            Console.WriteLine($"Selling order with total price: {total}$.");
+            _paymentMethod.Pay(total);
+        }
+    }
+
     abstract class ProductFactory //abstract makes it easier to makenew prod
     {
         public abstract IProduct CreateProduct();
@@ -110,37 +160,39 @@ namespace lab2
             return new Loan(_months, _Rate);
         }
     }
+ 
 
-    class SaleSystem //class for making sales
-    {
-        public void SellProduct(IProduct product, int quantity, IPay payment)
-        {
-            double total = product.Price * quantity; //total price
-            payment.Pay(total);
-        }
-    }
+    
 
     class Program
     {
         static void Main(string[] args)
         {
+            
             ProductFactory phoneFactory = new PhoneFactory();
             ProductFactory laptopFactory = new LaptopFactory();
 
+            
             IProduct phone = phoneFactory.CreateProduct();
             IProduct laptop = laptopFactory.CreateProduct();
 
-            PaymentFactory cardFactory = new CardFactory();
-            PaymentFactory loanFactory = new LoanFactory(12, 10); 
+         
+            IPay cardPayment = new CardPayment();
+            IPay loanPayment = new Loan(12, 10); // 12 months, 10% rate
 
-            IPay CardPayment = cardFactory.CreatePayment();
-            IPay loanPayment = loanFactory.CreatePayment();
+            //individual sales 
+            SaleSystem saleSystem = new BasicSale(cardPayment);
+            saleSystem.SellProduct(phone, 1);
 
-            SaleSystem saleSystem = new SaleSystem();
+            // Sale system for processing order with loan payment
+            SaleSystem saleLoan = new BasicSale(loanPayment);
+            SaleSystem saleCard = new BasicSale(cardPayment);
+            Order order = new Order();
+            order.AddItem(phone, 1);
+            order.AddItem(laptop, 1);
+            saleLoan.SellOrder(order); // Sell order with loan payment
+            saleCard.SellOrder(order);//Sell order with card payment
 
-            saleSystem.SellProduct(phone, 1, CardPayment);
-
-            saleSystem.SellProduct(laptop, 1, loanPayment);
             Console.ReadLine();
         }
     }
