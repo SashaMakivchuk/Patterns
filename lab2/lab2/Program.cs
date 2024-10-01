@@ -15,10 +15,15 @@ namespace lab2
     //    функціоналу системи в майбутньому, наприклад, акційне замовлення:
     //    список товарів із вказаною знижкою у % та
     //    нових способів оплати, наприклад, оплата частинами без %.
-    interface IProduct //interface for every prod that is made/going to be made
+    interface IPrice // Interface for anything that has a price
+    {
+        double Price { get; }
+    }
+
+    interface IProduct : IPrice //interface for every prod that is made/going to be made
     {
         string Name { get; }
-        double Price { get; }
+
     }
 
     class Phone : IProduct
@@ -32,10 +37,12 @@ namespace lab2
         public string Name { get; } = "Laptop";
         public double Price { get; } = 300;
     }
+
     interface IPay //interface for payment methods
     {
         void Pay(double amount);
     }
+    
     class CardPayment : IPay
     {
         public void Pay(double amount)
@@ -49,10 +56,10 @@ namespace lab2
         private int _months;
         private double _Rate;
 
-        public Loan(int months, double Rate) 
+        public Loan(int months, double rate) 
         {
             _months = months;
-            _Rate = Rate; //how much to pay per month
+            _Rate = rate; //how much to pay per month
         }
 
         public void Pay(double amount)
@@ -60,8 +67,10 @@ namespace lab2
             double monthlyPayment = (amount * (1 + _Rate / 100)) / _months; //calculate payment per month
             Console.WriteLine($"Credit for: {amount}$. Month pay: {monthlyPayment}$ for {_months} month(s).");
         }
+       
     }
-    class Order // Class for managing orders
+
+    class Order : IPrice // Class for managing orders
     {
         private List<(IProduct product, int quantity)> _items = new List<(IProduct, int)>();
 
@@ -69,17 +78,21 @@ namespace lab2
         {
             _items.Add((product, quantity));
         }
-
-        public double GetTotalPrice()
+        public double Price
         {
-            double total = 0;
-            foreach (var item in _items)
+            get
             {
-                total += item.product.Price * item.quantity;
+                double total = 0;
+                foreach (var item in _items)
+                {
+                    total += item.product.Price * item.quantity;
+                }
+                return total;
             }
-            return total;
         }
+        
     }
+
     abstract class SaleSystem // Abstraction in the Bridge pattern
     {
         protected IPay _paymentMethod;
@@ -89,24 +102,17 @@ namespace lab2
             _paymentMethod = paymentMethod;
         }
 
-        public abstract void SellProduct(IProduct product, int quantity);
-        public abstract void SellOrder(Order order);
+        public abstract void SellItem(IPrice priceable, int quantity = 1);
     }
+
     class BasicSale : SaleSystem // Concrete Abstraction
     {
         public BasicSale(IPay paymentMethod) : base(paymentMethod) { }
 
-        public override void SellProduct(IProduct product, int quantity)
+        public override void SellItem(IPrice priceable, int quantity = 1)
         {
-            double total = product.Price * quantity; // Total price for product
-            Console.WriteLine($"Selling {quantity} unit(s) of {product.Name} at {product.Price}$ each.");
-            _paymentMethod.Pay(total);
-        }
-
-        public override void SellOrder(Order order)
-        {
-            double total = order.GetTotalPrice();
-            Console.WriteLine($"Selling order with total price: {total}$.");
+            double total = priceable.Price * quantity;
+            Console.WriteLine($"Selling {quantity} item(s) at {priceable.Price}$ each.");
             _paymentMethod.Pay(total);
         }
     }
@@ -123,6 +129,7 @@ namespace lab2
             return new Phone();
         }
     }
+
     class LaptopFactory : ProductFactory
     {
         public override IProduct CreateProduct()
@@ -162,7 +169,8 @@ namespace lab2
     }
  
 
-    
+
+
 
     class Program
     {
@@ -182,7 +190,7 @@ namespace lab2
 
             //individual sales 
             SaleSystem saleSystem = new BasicSale(cardPayment);
-            saleSystem.SellProduct(phone, 1);
+            saleSystem.SellItem(phone,1);
 
             // Sale system for processing order with loan payment
             SaleSystem saleLoan = new BasicSale(loanPayment);
@@ -190,8 +198,8 @@ namespace lab2
             Order order = new Order();
             order.AddItem(phone, 1);
             order.AddItem(laptop, 1);
-            saleLoan.SellOrder(order); // Sell order with loan payment
-            saleCard.SellOrder(order);//Sell order with card payment
+            saleLoan.SellItem(order); // Sell order with loan payment
+            saleCard.SellItem(order);//Sell order with card payment
 
             Console.ReadLine();
         }
