@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Module_Patterns;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,7 +10,7 @@ namespace Module_Patterns
 {
     public class ReplySender
     {
-        private MessageCollection _messageCollection;
+        private readonly MessageCollection _messageCollection;
 
         public ReplySender(MessageCollection messageCollection)
         {
@@ -17,11 +19,14 @@ namespace Module_Patterns
 
         public void SendReplyToAll(string targetText, string replyText)
         {
-            foreach (var message in _messageCollection)
+            var iterator = _messageCollection.CreateIterator();
+
+            while (iterator.MoveNext())
             {
+                var message = iterator.Current;
                 if (message.Text.Contains(targetText))
                 {
-                    Console.WriteLine($"Send reply {message.Sender} ({message.Date}): {replyText}");
+                    Console.WriteLine($"Надсилання відповіді відправнику {message.Sender} ({message.Date}): {replyText}");
                 }
             }
         }

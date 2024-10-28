@@ -7,31 +7,19 @@ using System.Threading.Tasks;
 
 namespace Module_Patterns
 {
-    public class MessageCollection : IEnumerable<Message>
+    public class MessageCollection : ICollection<Message>
     {
-        private List<Message> _messages = new List<Message>();
+        private readonly List<Message> _messages = new List<Message>();
 
         public void AddMessage(Message message)
         {
             _messages.Add(message);
         }
 
-        public IEnumerator<Message> GetEnumerator()
+        public IIterator<Message> CreateIterator()
         {
-            var sortedMessages = _messages
-                .OrderBy(m => m.Sender)
-                .ThenBy(m => m.Date)
-                .ToList();
-
-            foreach (var message in sortedMessages)
-            {
-                yield return message;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            return new MessageIterator(_messages);
         }
     }
 }
+
