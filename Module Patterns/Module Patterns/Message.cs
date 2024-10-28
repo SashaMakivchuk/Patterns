@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Module_Patterns
-{
+{ // to save messages
     public class Message
     {
         public DateTime Date { get; }

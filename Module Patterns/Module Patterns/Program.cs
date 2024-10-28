@@ -36,17 +36,17 @@ namespace Module_Patterns
     {
 
         static void Main()
-        {
+        { //create collection for messages
             var messageCollection = new MessageCollection();
-
+            //add messages
             messageCollection.AddMessage(new Message(new DateTime(2023, 10, 1), "Alice", "Bob", "Hello"));
             messageCollection.AddMessage(new Message(new DateTime(2023, 10, 2), "Bob", "Alice", "Hi, how are you?"));
             messageCollection.AddMessage(new Message(new DateTime(2023, 10, 3), "Alice", "Charlie", "Meeting at 5"));
             messageCollection.AddMessage(new Message(new DateTime(2023, 10, 1), "Charlie", "Alice", "Got it, thanks!"));
             messageCollection.AddMessage(new Message(new DateTime(2023, 10, 4), "Charlie", "Alice", "Hi Alice! Are you available?"));
-
+            // for replies
             var replySender = new ReplySender(messageCollection);
-
+            //send replies
             replySender.SendReplyToAll("Hi", "Hello! How can I help you?");
         }
     }

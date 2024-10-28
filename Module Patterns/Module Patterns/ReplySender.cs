@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Module_Patterns
-{
+{ // for sending replies
     public class ReplySender
     {
         private readonly MessageCollection _messageCollection;
@@ -26,7 +26,7 @@ namespace Module_Patterns
                 var message = iterator.Current;
                 if (message.Text.Contains(targetText))
                 {
-                    Console.WriteLine($"Надсилання відповіді відправнику {message.Sender} ({message.Date}): {replyText}");
+                    Console.WriteLine($"Reply {message.Sender} ({message.Date}): {replyText}");
                 }
             }
         }

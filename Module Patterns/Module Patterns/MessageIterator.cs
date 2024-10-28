@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Module_Patterns
-{
+{ // iterator forr messages
     public class MessageIterator : IIterator<Message>
     {
         private readonly List<Message> _messages;
@@ -13,7 +13,7 @@ namespace Module_Patterns
 
         public MessageIterator(List<Message> messages)
         {
-            _messages = messages.OrderBy(m => m.Sender).ThenBy(m => m.Date).ToList(); // Сортуємо за відправником і датою
+            _messages = messages.OrderBy(m => m.Sender).ThenBy(m => m.Date).ToList();
         }
 
         public Message Current => _messages[_position];

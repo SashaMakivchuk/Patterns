@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Module_Patterns
-{
+{ // colection for messages
     public class MessageCollection : ICollection<Message>
     {
         private readonly List<Message> _messages = new List<Message>();
